@@ -17,15 +17,13 @@ int main(int argc, char **argv)
     exit(EXIT_FAILURE);
   }
 
-  printf("hello");
-
   int Sockfd;
   char Buffer[BUFFERSIZE];
 
   struct sockaddr_in ServAddr;
 
-  int Ip = *argv[1];
-  int Port = *argv[2];
+  int Ip = strtol(argv[2], (char **)NULL, 10);
+  int Port = strtol(argv[2], (char **)NULL, 10);
 
   // Creating socket file descriptor
   if ((Sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
@@ -41,10 +39,14 @@ int main(int argc, char **argv)
   ServAddr.sin_port = htons(Port);
   ServAddr.sin_addr.s_addr = INADDR_ANY;
 
+
+  printf("Enter string: ");
+  fgets(Buffer, BUFFERSIZE, stdin);
+
+  //int InitialInt = strtol(Buffer, (char **)NULL, 10);
+
   socklen_t len;
   int n;
-
-  fgets(Buffer, BUFFERSIZE, stdin);
 
   sendto(
       Sockfd,
@@ -54,5 +56,24 @@ int main(int argc, char **argv)
       (const struct sockaddr *) &ServAddr,
       sizeof(ServAddr));
 
-  printf("Hello message sent.\n");
+  int CurrentVal = INT32_MAX;
+
+  while(CurrentVal > 10)
+  {
+    n = recvfrom(
+        Sockfd,
+        (char *)Buffer,
+        BUFFERSIZE,
+        MSG_WAITALL,
+        (struct sockaddr *)& ServAddr,
+        &len);
+
+    Buffer[n] ='\0';
+
+    CurrentVal = strtol(Buffer, (char **)NULL, 10);
+
+    printf("From server: %d\n", CurrentVal);
+  }
+
+  return 0;
 }

@@ -17,14 +17,14 @@ int main(int argc, char **argv)
     exit(EXIT_FAILURE);
   }
 
-  printf("hello");
-
   int Sockfd;
   char Buffer[BUFFERSIZE];
 
   struct sockaddr_in ServAddr, CliAddr;
 
-  int port = *argv[1];
+  int Port = strtol(argv[1], (char **)NULL, 10);
+
+  printf("port: %d\n", Port);
 
   if ((Sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
   {
@@ -36,8 +36,8 @@ int main(int argc, char **argv)
   memset(&CliAddr, 0, sizeof(CliAddr));
 
   ServAddr.sin_family = AF_INET;
-  ServAddr.sin_addr.s_addr = INADDR_ANY;
-  ServAddr.sin_port = htons(port);
+  ServAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+  ServAddr.sin_port = htons(Port);
 
   if (bind(Sockfd, (const struct sockaddr *)& ServAddr, sizeof(ServAddr)) < 0)
   {
