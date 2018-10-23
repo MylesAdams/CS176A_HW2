@@ -24,7 +24,6 @@ int main(int argc, char **argv)
 
   struct sockaddr_in ServAddr;
 
-  int Ip = strtol(argv[2], (char **)NULL, 10);
   int Port = strtol(argv[2], (char **)NULL, 10);
 
   // Creating socket file descriptor
@@ -39,7 +38,7 @@ int main(int argc, char **argv)
   // Filling server information
   ServAddr.sin_family = AF_INET;
   ServAddr.sin_port = htons(Port);
-  ServAddr.sin_addr.s_addr = htonl(INADDR_ANY);
+  ServAddr.sin_addr.s_addr = inet_addr(argv[1]);
 
 
   printf("Enter string: ");
