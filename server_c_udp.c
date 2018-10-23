@@ -6,6 +6,9 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <ctype.h>
+#include <errno.h>
+#include <limits.h>
 
 #define BUFFERSIZE 128
 
@@ -18,13 +21,12 @@ int main(int argc, char **argv)
   }
 
   int Sockfd;
-  char Buffer[BUFFERSIZE];
+  char InBuffer[BUFFERSIZE];
+  char OutBuffer[BUFFERSIZE];
 
   struct sockaddr_in ServAddr, CliAddr;
 
   int Port = strtol(argv[1], (char **)NULL, 10);
-
-  printf("port: %d\n", Port);
 
   if ((Sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
   {
@@ -45,18 +47,72 @@ int main(int argc, char **argv)
     exit(EXIT_FAILURE);
   }
 
-  socklen_t len;
-  int n;
+  int n, CurrentValue, IsValidMessage;
+  socklen_t len = sizeof(CliAddr);
 
-  n = recvfrom(
-      Sockfd,
-      (char *)Buffer,
-      BUFFERSIZE, MSG_WAITALL,
-      (struct sockaddr *)& CliAddr,
-      &len);
+  while(1)
+  {
+    memset(InBuffer, 0, BUFFERSIZE);
+    memset(OutBuffer, 0, BUFFERSIZE);
 
-  Buffer[n] ='\0';
+    IsValidMessage = 1;
 
-  printf("Client says: %s\n", Buffer);
+    n = recvfrom(
+        Sockfd,
+        (char *)InBuffer,
+        BUFFERSIZE,
+        MSG_WAITALL,
+        (struct sockaddr *)& CliAddr,
+        &len);
 
+    InBuffer[n - 1] ='\0';
+
+    strncpy(OutBuffer, InBuffer, n);
+
+    for (int i = 0; i < n - 1; ++i)
+    {
+      if (!isdigit(InBuffer[i]))
+      {
+        IsValidMessage = 0;
+        break;
+      }
+    }
+
+    if (IsValidMessage)
+    {
+      CurrentValue = INT_MAX;
+
+      while (CurrentValue >= 10)
+      {
+        CurrentValue = 0;
+        for (int i = 0; i < strlen(OutBuffer); ++i)
+        {
+          CurrentValue += OutBuffer[i] - '0';
+        }
+
+        snprintf(OutBuffer, BUFFERSIZE, "%d", CurrentValue);
+
+        sendto(
+            Sockfd,
+            (const char *)OutBuffer,
+            strlen(OutBuffer),
+            MSG_CONFIRM,
+            (const struct sockaddr *) &CliAddr,
+            len);
+      }
+
+    }
+    else
+    {
+      snprintf(OutBuffer, BUFFERSIZE, "Sorry, cannot compute!");
+
+      sendto(
+          Sockfd,
+          (const char *)OutBuffer,
+          strlen(OutBuffer),
+          MSG_CONFIRM,
+          (const struct sockaddr *) &CliAddr,
+          len);
+    }
+  }
 }

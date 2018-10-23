@@ -6,6 +6,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
+#include <limits.h>
+#include <ctype.h>
 
 #define BUFFERSIZE 128
 
@@ -37,7 +39,7 @@ int main(int argc, char **argv)
   // Filling server information
   ServAddr.sin_family = AF_INET;
   ServAddr.sin_port = htons(Port);
-  ServAddr.sin_addr.s_addr = INADDR_ANY;
+  ServAddr.sin_addr.s_addr = htonl(INADDR_ANY);
 
 
   printf("Enter string: ");
@@ -56,10 +58,12 @@ int main(int argc, char **argv)
       (const struct sockaddr *) &ServAddr,
       sizeof(ServAddr));
 
-  int CurrentVal = INT32_MAX;
+  int CurrentVal = INT_MAX;
 
-  while(CurrentVal > 10)
+  while(CurrentVal >= 10)
   {
+    memset(Buffer, 0, BUFFERSIZE);
+
     n = recvfrom(
         Sockfd,
         (char *)Buffer,
@@ -70,9 +74,17 @@ int main(int argc, char **argv)
 
     Buffer[n] ='\0';
 
+    printf("From server: %s\n", Buffer);
+
     CurrentVal = strtol(Buffer, (char **)NULL, 10);
 
-    printf("From server: %d\n", CurrentVal);
+    for (int i = 0; i < n; i++)
+    {
+      if (!isdigit(Buffer[i]))
+      {
+        CurrentVal = -1;
+      }
+    }
   }
 
   return 0;
