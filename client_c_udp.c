@@ -41,13 +41,15 @@ int main(int argc, char **argv)
   printf("Enter string: ");
   fgets(Buffer, BUFFERSIZE, stdin);
 
+  Buffer[strcspn(Buffer, "\n")] = 0;
+
   socklen_t len;
   int n;
 
   sendto(
       Sockfd,
       (const char *)Buffer,
-      strlen(Buffer),
+      strlen(Buffer) + 1,
       0,
       (const struct sockaddr *) &ServAddr,
       sizeof(ServAddr));

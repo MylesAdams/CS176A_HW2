@@ -47,7 +47,7 @@ int main(int argc, char **argv)
     exit(EXIT_FAILURE);
   }
 
-  int n, CurrentValue, IsValidMessage;
+  int MsgLength, CurrentValue, IsValidMessage;
   socklen_t len = sizeof(CliAddr);
 
   while(1)
@@ -57,7 +57,7 @@ int main(int argc, char **argv)
 
     IsValidMessage = 1;
 
-    n = recvfrom(
+    MsgLength = recvfrom(
         Sockfd,
         (char *)InBuffer,
         BUFFERSIZE,
@@ -65,11 +65,11 @@ int main(int argc, char **argv)
         (struct sockaddr *)& CliAddr,
         &len);
 
-    InBuffer[n - 1] ='\0';
+    //InBuffer[n] ='\0';
 
-    strncpy(OutBuffer, InBuffer, n);
+    strncpy(OutBuffer, InBuffer, MsgLength);
 
-    for (int i = 0; i < n - 1; ++i)
+    for (int i = 0; i < MsgLength - 1; ++i)
     {
       if (!isdigit(InBuffer[i]))
       {
