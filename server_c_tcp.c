@@ -127,6 +127,8 @@ int main(int argc, char **argv)
       send(Connfd, InvalidInputMessage, strlen(InvalidInputMessage) + 1, 0);
     }
 
+    close(Connfd);
+
   }
 
   return 0;

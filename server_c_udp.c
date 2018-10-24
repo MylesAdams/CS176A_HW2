@@ -65,8 +65,6 @@ int main(int argc, char **argv)
         (struct sockaddr *)& CliAddr,
         &len);
 
-    //InBuffer[n] ='\0';
-
     strncpy(OutBuffer, InBuffer, MsgLength);
 
     for (int i = 0; i < MsgLength - 1; ++i)
@@ -95,7 +93,7 @@ int main(int argc, char **argv)
         sendto(
             Sockfd,
             (const char *)OutBuffer,
-            strlen(OutBuffer),
+            strlen(OutBuffer) + 1,
             0,
             (const struct sockaddr *) &CliAddr,
             len);
@@ -109,7 +107,7 @@ int main(int argc, char **argv)
       sendto(
           Sockfd,
           (const char *)OutBuffer,
-          strlen(OutBuffer),
+          strlen(OutBuffer) + 1,
           0,
           (const struct sockaddr *) &CliAddr,
           len);

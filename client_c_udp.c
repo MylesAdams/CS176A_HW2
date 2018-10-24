@@ -44,7 +44,6 @@ int main(int argc, char **argv)
   Buffer[strcspn(Buffer, "\n")] = 0;
 
   socklen_t len;
-  int n;
 
   sendto(
       Sockfd,
@@ -54,13 +53,11 @@ int main(int argc, char **argv)
       (const struct sockaddr *) &ServAddr,
       sizeof(ServAddr));
 
-  int CurrentValue = INT_MAX;
-
-  while(CurrentValue >= 10)
+  while(1)
   {
     memset(Buffer, 0, BUFFERSIZE);
 
-    n = recvfrom(
+    recvfrom(
         Sockfd,
         (char *)Buffer,
         BUFFERSIZE,
@@ -68,19 +65,13 @@ int main(int argc, char **argv)
         (struct sockaddr *)& ServAddr,
         &len);
 
-    Buffer[n] ='\0';
-
     printf("From server: %s\n", Buffer);
 
-    CurrentValue = strtol(Buffer, (char **)NULL, 10);
-
-    for (int i = 0; i < n; i++)
+    if (strtol(Buffer, (char **)NULL, 10) < 10)
     {
-      if (!isdigit(Buffer[i]))
-      {
-        CurrentValue = -1;
-      }
+      break;
     }
+
   }
 
   return 0;

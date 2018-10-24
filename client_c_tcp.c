@@ -59,29 +59,23 @@ int main(int argc, char **argv)
 
   unsigned long InMsgLength;
 
-  int CurrentValue = INT_MAX;
-
-  while(CurrentValue >= 10)
+  while(1)
   {
     memset(Buffer, 0, BUFFERSIZE);
 
-    recv(Sockfd, (char *)& InMsgLength, sizeof(InMsgLength), 0);
+    if (recv(Sockfd, (char *)& InMsgLength, sizeof(InMsgLength), 0) == 0)
+    {
+      break;
+    }
 
     InMsgLength = ntohl(InMsgLength);
 
-    recv(Sockfd, Buffer, InMsgLength, 0);
+    if (recv(Sockfd, Buffer, InMsgLength, 0) == 0)
+    {
+      break;
+    }
 
     printf("From Server: %s\n", Buffer);
-
-    CurrentValue = strtol(Buffer, (char **)NULL, 10);
-
-    for (int i = 0; i < InMsgLength - 1; i++)
-    {
-      if (!isdigit(Buffer[i]))
-      {
-        CurrentValue = -1;
-      }
-    }
   }
 
   return 0;
