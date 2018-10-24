@@ -52,7 +52,7 @@ int main(int argc, char **argv)
 
   if (setsockopt(Sockfd, SOL_SOCKET, SO_REUSEADDR, &(int){1}, sizeof(int)) < 0)
   {
-    perror("setsockopt(SO_REUSEADDR) failed");
+    perror("Failed to set socket as reusable");
     exit(EXIT_FAILURE);
   }
 
