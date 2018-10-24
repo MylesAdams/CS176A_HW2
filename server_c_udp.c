@@ -1,3 +1,12 @@
+/*
+  I haven't strictly copied any code from the internet, but I used one specific article/reference
+  on geeksforgeeks.org for the UDP client/server programs. I have done socket programming before
+  so I used it mainly to remind myself the syntax and some smaller specific things, like the more
+  standard variable naming a lot of people use for socket programming.
+
+  Here is the link: https://www.geeksforgeeks.org/udp-server-client-implementation-c/.
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -10,7 +19,7 @@
 #include <errno.h>
 #include <limits.h>
 
-#define BUFFERSIZE 128
+#define BUFFERSIZE 130
 
 int main(int argc, char **argv)
 {
