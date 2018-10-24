@@ -101,6 +101,7 @@ int main(int argc, char **argv)
       while(CurrentValue >= 10)
       {
         CurrentValue = 0;
+
         for (int i = 0; i < strlen(OutBuffer); ++i)
         {
           CurrentValue += OutBuffer[i] - '0';

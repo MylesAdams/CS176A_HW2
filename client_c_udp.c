@@ -26,7 +26,6 @@ int main(int argc, char **argv)
 
   int Port = strtol(argv[2], (char **)NULL, 10);
 
-  // Creating socket file descriptor
   if ((Sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
   {
     perror("socket creation failed");
@@ -35,16 +34,12 @@ int main(int argc, char **argv)
 
   memset(&ServAddr, 0, sizeof(ServAddr));
 
-  // Filling server information
   ServAddr.sin_family = AF_INET;
   ServAddr.sin_port = htons(Port);
   ServAddr.sin_addr.s_addr = inet_addr(argv[1]);
 
-
   printf("Enter string: ");
   fgets(Buffer, BUFFERSIZE, stdin);
-
-  //int InitialInt = strtol(Buffer, (char **)NULL, 10);
 
   socklen_t len;
   int n;
@@ -57,9 +52,9 @@ int main(int argc, char **argv)
       (const struct sockaddr *) &ServAddr,
       sizeof(ServAddr));
 
-  int CurrentVal = INT_MAX;
+  int CurrentValue = INT_MAX;
 
-  while(CurrentVal >= 10)
+  while(CurrentValue >= 10)
   {
     memset(Buffer, 0, BUFFERSIZE);
 
@@ -75,13 +70,13 @@ int main(int argc, char **argv)
 
     printf("From server: %s\n", Buffer);
 
-    CurrentVal = strtol(Buffer, (char **)NULL, 10);
+    CurrentValue = strtol(Buffer, (char **)NULL, 10);
 
     for (int i = 0; i < n; i++)
     {
       if (!isdigit(Buffer[i]))
       {
-        CurrentVal = -1;
+        CurrentValue = -1;
       }
     }
   }
