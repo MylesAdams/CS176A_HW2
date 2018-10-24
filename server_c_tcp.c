@@ -53,28 +53,80 @@ int main(int argc, char **argv)
     exit(EXIT_FAILURE);
   }
 
-  if (listen(Sockfd, 3) < 0)
-  {
-    perror("Listening error");
-    exit(EXIT_FAILURE);
-  }
-
   socklen_t len = sizeof(CliAddr);
 
-  if ((Connfd = accept(Sockfd, (struct sockaddr *)&CliAddr,
-                           (socklen_t*)&len))<0) 
+  while(1)
   {
-    perror("Accepting error");
-    exit(EXIT_FAILURE);
+    if (listen(Sockfd, 3) < 0)
+    {
+      perror("Listening error");
+      exit(EXIT_FAILURE);
+    }
+
+    if ((Connfd = accept(Sockfd, (struct sockaddr *)&CliAddr, (socklen_t*)&len))<0)
+    {
+      perror("Accepting error");
+      exit(EXIT_FAILURE);
+    }
+
+    unsigned long InMsgLength;
+
+    recv(Connfd, (char *)& InMsgLength, sizeof(InMsgLength), 0);
+
+    InMsgLength = ntohl(InMsgLength);
+
+    recv(Connfd, InBuffer, InMsgLength, 0);
+
+    InBuffer[InMsgLength] = '\0';
+
+    strncpy(OutBuffer, InBuffer, InMsgLength);
+
+    int IsValidMessage = 1;
+
+    for (int i = 0; i < InMsgLength - 1; ++i)
+    {
+      if (!isdigit(OutBuffer[i]))
+      {
+        IsValidMessage = 0;
+        break;
+      }
+    }
+
+    int CurrentValue = INT_MAX;
+
+    unsigned long OutMsgLength;
+
+    if (IsValidMessage)
+    {
+      while(CurrentValue >= 10)
+      {
+        CurrentValue = 0;
+        for (int i = 0; i < strlen(OutBuffer); ++i)
+        {
+          CurrentValue += OutBuffer[i] - '0';
+        }
+
+        snprintf(OutBuffer, sizeof(CurrentValue), "%d", CurrentValue);
+
+        OutMsgLength = htonl(strlen(OutBuffer) + 1);
+
+        send(Connfd, (char *)&OutMsgLength, sizeof(OutMsgLength), 0);
+
+        send(Connfd, OutBuffer, strlen(OutBuffer) + 1, 0);
+      }
+    }
+    else
+    {
+      char* InvalidInputMessage = "Sorry cannot compute!\0";
+
+      OutMsgLength = htonl(strlen(InvalidInputMessage) + 1);
+
+      send(Connfd, (char *)& OutMsgLength, sizeof(OutMsgLength), 0);
+
+      send(Connfd, InvalidInputMessage, strlen(InvalidInputMessage) + 1, 0);
+    }
+
   }
-
-  char* hello = "Hello there, how is it going as well?\0";
-
-  read(Connfd, InBuffer, sizeof(InBuffer));
-
-  printf("Inbuffer: %s\n", InBuffer);
-
-  write(Connfd, hello, strlen(hello));
 
   return 0;
 }

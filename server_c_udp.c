@@ -96,7 +96,7 @@ int main(int argc, char **argv)
             Sockfd,
             (const char *)OutBuffer,
             strlen(OutBuffer),
-            MSG_CONFIRM,
+            0,
             (const struct sockaddr *) &CliAddr,
             len);
       }
@@ -110,7 +110,7 @@ int main(int argc, char **argv)
           Sockfd,
           (const char *)OutBuffer,
           strlen(OutBuffer),
-          MSG_CONFIRM,
+          0,
           (const struct sockaddr *) &CliAddr,
           len);
     }
